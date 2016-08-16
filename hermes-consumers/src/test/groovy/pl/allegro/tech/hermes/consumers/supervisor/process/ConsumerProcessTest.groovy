@@ -29,6 +29,7 @@ class ConsumerProcessTest extends Specification {
             consumer,
             retransmitter,
             { a -> shutdownRun = true },
+            100,
             Clock.fixed(Instant.ofEpochMilli(1024), ZoneId.systemDefault())
     )
 
@@ -96,9 +97,7 @@ class ConsumerProcessTest extends Specification {
         waiter.waitForSignalProcessing()
 
         then:
-        consumer.tearDownCount == 1
-        1 * retransmitter.reloadOffsets(_)
-        consumer.initializationCount == 2
+        1 * retransmitter.reloadOffsets(_,_)
 
         cleanup:
         process.accept(Signal.of(Signal.SignalType.STOP, subscription))

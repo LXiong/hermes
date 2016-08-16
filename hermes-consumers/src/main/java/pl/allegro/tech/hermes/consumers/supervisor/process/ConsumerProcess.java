@@ -34,6 +34,7 @@ public class ConsumerProcess implements Runnable {
             Consumer consumer,
             Retransmitter retransmitter,
             java.util.function.Consumer<SubscriptionName> shutdownCallback,
+            int commitIntervalMs,
             Clock clock
     ) {
         this.subscriptionName = subscriptionName;
@@ -55,6 +56,8 @@ public class ConsumerProcess implements Runnable {
             }
             stop();
 
+        } catch (Exception ex) {
+            logger.error("Consumer process of subscription {} failed", subscriptionName, ex);
         } finally {
             logger.info("Releasing consumer process thred of subscription {}", subscriptionName);
             shutdownCallback.accept(subscriptionName);
@@ -99,6 +102,9 @@ public class ConsumerProcess implements Runnable {
             case UPDATE_TOPIC:
                 consumer.updateTopic(signal.getPayload());
                 break;
+            case COMMIT:
+                consumer.commit(signal.getPayload());
+                break;
         }
     }
 
@@ -123,9 +129,7 @@ public class ConsumerProcess implements Runnable {
     private void retransmit() {
         long startTime = clock.millis();
         logger.info("Starting retransmission for consumer of subscription {}", subscriptionName);
-        stop();
-        retransmitter.reloadOffsets(subscriptionName);
-        start();
+        retransmitter.reloadOffsets(subscriptionName, consumer);
         logger.info("Done retransmission for consumer of subscription {} in {}ms", subscriptionName, clock.millis() - startTime);
     }
 
@@ -164,6 +168,4 @@ public class ConsumerProcess implements Runnable {
     public Consumer getConsumer() {
         return consumer;
     }
-
-
 }

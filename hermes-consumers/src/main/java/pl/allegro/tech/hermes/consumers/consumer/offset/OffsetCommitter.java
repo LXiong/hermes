@@ -71,24 +71,22 @@ public class OffsetCommitter implements Runnable {
 
     private final OffsetQueue offsetQueue;
 
-    private final List<MessageCommitter> messageCommitters;
+    private final MessageCommitter messageCommitter;
 
     private final HermesMetrics metrics;
 
     private final Set<SubscriptionPartitionOffset> inflightOffsets = new HashSet<>();
 
-    private final Set<SubscriptionPartitionOffset> failedToCommitOffsets = new HashSet<>();
-
     private final MpscArrayQueue<SubscriptionName> subscriptionsToCleanup = new MpscArrayQueue<>(1000);
 
     public OffsetCommitter(
             OffsetQueue offsetQueue,
-            List<MessageCommitter> messageCommitters,
+            MessageCommitter messageCommitter,
             int offsetCommitPeriodSeconds,
             HermesMetrics metrics
     ) {
         this.offsetQueue = offsetQueue;
-        this.messageCommitters = messageCommitters;
+        this.messageCommitter = messageCommitter;
         this.offsetCommitPeriodSeconds = offsetCommitPeriodSeconds;
         this.metrics = metrics;
     }
@@ -117,10 +115,9 @@ public class OffsetCommitter implements Runnable {
                 }
             }
 
-            commit(offsetsToCommit);
+            messageCommitter.commitOffsets(offsetsToCommit);
 
-            metrics.counter("offset-committer.committed").inc(scheduledToCommit - failedToCommitOffsets.size());
-            metrics.counter("offset-committer.failed").inc(failedToCommitOffsets.size());
+            metrics.counter("offset-committer.committed").inc(scheduledToCommit);
 
             cleanupUnusedSubscriptions();
         } catch (Exception exception) {
@@ -132,9 +129,6 @@ public class OffsetCommitter implements Runnable {
         ReducingConsumer committedOffsetsReducer = new ReducingConsumer(Math::max, c -> c + 1);
         offsetQueue.drainCommittedOffsets(committedOffsetsReducer);
         committedOffsetsReducer.resetModifierFunction();
-        failedToCommitOffsets.forEach(committedOffsetsReducer::accept);
-        failedToCommitOffsets.clear();
-
         return committedOffsetsReducer;
     }
 
@@ -154,16 +148,6 @@ public class OffsetCommitter implements Runnable {
                                       Set<SubscriptionPartitionOffset> committedOffsets) {
         if (!committedOffsets.contains(offset)) {
             inflightOffsetReducer.accept(offset);
-        }
-    }
-
-    private void commit(OffsetsToCommit offsetsToCommit) {
-        for (MessageCommitter committer : messageCommitters) {
-            FailedToCommitOffsets failedOffsets = committer.commitOffsets(offsetsToCommit);
-
-            if (failedOffsets.hasFailed()) {
-                failedToCommitOffsets.addAll(failedOffsets.failedOffsets());
-            }
         }
     }
 

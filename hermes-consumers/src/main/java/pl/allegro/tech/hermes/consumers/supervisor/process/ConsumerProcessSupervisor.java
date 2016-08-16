@@ -11,9 +11,10 @@ import pl.allegro.tech.hermes.consumers.consumer.Consumer;
 import pl.allegro.tech.hermes.consumers.supervisor.ConsumersExecutorService;
 
 import java.time.Clock;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 public class ConsumerProcessSupervisor implements Runnable {
@@ -37,6 +38,7 @@ public class ConsumerProcessSupervisor implements Runnable {
     private final long unhealthyAfter;
 
     private long killAfter;
+    private int commitIntervalMs;
 
     public ConsumerProcessSupervisor(ConsumersExecutorService executor,
                                      Retransmitter retransmitter,
@@ -51,6 +53,7 @@ public class ConsumerProcessSupervisor implements Runnable {
         this.killAfter = configs.getIntProperty(Configs.CONSUMER_BACKGROUND_SUPERVISOR_KILL_AFTER);
 
         this.signalsFilter = new SignalsFilter(taskQueue, clock);
+        this.commitIntervalMs = configs.getIntProperty(Configs.CONSUMER_COMMIT_OFFSET_PERIOD);
     }
 
     public void accept(Signal signal) {
@@ -168,7 +171,7 @@ public class ConsumerProcessSupervisor implements Runnable {
 
         if (!runningProcesses.hasProcess(subscriptionName)) {
             ConsumerProcess process = new ConsumerProcess(subscriptionName, consumer, retransmitter,
-                    this::handleProcessShutdown, clock);
+                    this::handleProcessShutdown, commitIntervalMs, clock);
             Future future = executor.execute(process);
             runningProcesses.add(process, future);
             logger.info("Started consumer process {}", process);
@@ -188,5 +191,13 @@ public class ConsumerProcessSupervisor implements Runnable {
     public void shutdown() {
         runningProcesses.stream().forEach(p -> p.accept(Signal.of(Signal.SignalType.STOP, p.getSubscriptionName())));
         executor.shutdown();
+    }
+
+    public List<String> listRunningSubscriptions() {
+        return runningProcesses.listRunningSubscriptions();
+    }
+
+    public Integer countRunningSubscriptions() {
+        return runningProcesses.count();
     }
 }
