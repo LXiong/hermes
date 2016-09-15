@@ -8,8 +8,6 @@ import pl.allegro.tech.hermes.common.metric.HermesMetrics;
 import pl.allegro.tech.hermes.common.metric.Meters;
 import pl.allegro.tech.hermes.consumers.consumer.Message;
 import pl.allegro.tech.hermes.consumers.consumer.filtering.chain.FilterResult;
-import pl.allegro.tech.hermes.consumers.consumer.offset.OffsetQueue;
-import pl.allegro.tech.hermes.consumers.consumer.offset.OffsetsToCommit;
 import pl.allegro.tech.hermes.consumers.consumer.offset.SubscriptionPartitionOffset;
 import pl.allegro.tech.hermes.consumers.consumer.rate.ConsumerRateLimiter;
 import pl.allegro.tech.hermes.tracker.consumers.Trackers;
