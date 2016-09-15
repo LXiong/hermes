@@ -1,7 +1,6 @@
 package pl.allegro.tech.hermes.consumers.consumer.offset;
 
 import org.jctools.queues.MessagePassingQueue;
-import pl.allegro.tech.hermes.api.Subscription;
 import pl.allegro.tech.hermes.common.config.ConfigFactory;
 import pl.allegro.tech.hermes.common.config.Configs;
 import pl.allegro.tech.hermes.common.metric.HermesMetrics;

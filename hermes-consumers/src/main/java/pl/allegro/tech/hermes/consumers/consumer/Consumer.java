@@ -2,7 +2,6 @@ package pl.allegro.tech.hermes.consumers.consumer;
 
 import pl.allegro.tech.hermes.api.Subscription;
 import pl.allegro.tech.hermes.api.Topic;
-import pl.allegro.tech.hermes.consumers.consumer.offset.OffsetsToCommit;
 import pl.allegro.tech.hermes.consumers.consumer.offset.SubscriptionPartitionOffset;
 
 import java.util.Set;

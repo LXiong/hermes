@@ -3,8 +3,6 @@ package pl.allegro.tech.hermes.common.config;
 import com.google.common.io.Files;
 import pl.allegro.tech.hermes.common.util.InetAddressHostnameResolver;
 
-import java.util.UUID;
-
 import static java.lang.Math.abs;
 import static java.util.UUID.randomUUID;
 

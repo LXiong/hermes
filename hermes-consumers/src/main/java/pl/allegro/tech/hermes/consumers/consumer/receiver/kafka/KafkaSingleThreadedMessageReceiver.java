@@ -5,7 +5,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
@@ -135,7 +134,7 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
 
     @Override
     public void update(Subscription newSubscription) {
-        this.subscription = subscription;
+        this.subscription = newSubscription;
     }
 
     @Override
@@ -149,7 +148,9 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
     private Map<TopicPartition, OffsetAndMetadata> createOffset(Set<SubscriptionPartitionOffset> partitionOffsets) {
         Map<TopicPartition, OffsetAndMetadata> offsetsData = new LinkedHashMap<>();
         for (SubscriptionPartitionOffset partitionOffset : partitionOffsets) {
-            TopicPartition topicAndPartition = new TopicPartition(partitionOffset.getKafkaTopicName().asString(), partitionOffset.getPartition());
+            TopicPartition topicAndPartition = new TopicPartition(
+                    partitionOffset.getKafkaTopicName().asString(),
+                    partitionOffset.getPartition());
             offsetsData.put(topicAndPartition, new OffsetAndMetadata(partitionOffset.getOffset()));
         }
         return offsetsData;
