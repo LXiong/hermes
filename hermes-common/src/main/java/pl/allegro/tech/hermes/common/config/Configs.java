@@ -37,7 +37,7 @@ public enum Configs {
     KAFKA_CONSUMER_SESSION_TIMEOUT_MS_CONFIG("kafka.consumer.session.timeout.ms", 30000),
     KAFKA_CONSUMER_HEARTBEAT_INTERVAL_MS_CONFIG("kafka.consumer.heartbeat.interval.ms", 3000),
     KAFKA_CONSUMER_METADATA_MAX_AGE_CONFIG("kafka.consumer.metadata.max.age.ms", 5 * 60 * 1000),
-    KAFKA_CONSUMER_MAX_PARTITION_FETCH_BYTES_CONFIG("kafka.consumer.max.partition.fetch.bytes", 1000),
+    KAFKA_CONSUMER_MAX_PARTITION_FETCH_BYTES_CONFIG("kafka.consumer.max.partition.fetch.bytes", 128 * 1024),
     KAFKA_CONSUMER_SEND_BUFFER_CONFIG("kafka.consumer.send.buffer.bytes", 128 * 1024),
     KAFKA_CONSUMER_RECEIVE_BUFFER_CONFIG("kafka.consumer.receive.buffer.bytes", 64 * 1024),
     KAFKA_CONSUMER_FETCH_MIN_BYTES_CONFIG("kafka.consumer.fetch.min.bytes", 1),
@@ -115,10 +115,10 @@ public enum Configs {
     MESSAGES_LOADING_WAIT_FOR_BROKER_TOPIC_INFO("frontend.messages.loading.wait.for.broker.topic.info", 5),
 
     CONSUMER_RECEIVER_POOL_TIMEOUT("consumer.receiver.pool.timeout", 100),
-    CONSUMER_RECEIVER_READ_QUEUE_CAPACITY("consumer.receiver.read.queue.capacity", 200_000),
+    CONSUMER_RECEIVER_READ_QUEUE_CAPACITY("consumer.receiver.read.queue.capacity", 1000),
 
     CONSUMER_COMMIT_OFFSET_PERIOD("consumer.commit.offset.period.ms", 15 * 1000),
-    CONSUMER_COMMIT_OFFSET_QUEUES_SIZE("consumer.commit.offset.queues.size", 1000),
+    CONSUMER_COMMIT_OFFSET_QUEUES_SIZE("consumer.commit.offset.queues.size", 200_000),
 
     CONSUMER_SENDER_ASYNC_TIMEOUT_MS("consumer.sender.async.timeout.ms", 5_000),
     CONSUMER_SENDER_ASYNC_TIMEOUT_THREAD_POOL_SIZE("consumer.sender.async.timeout.thread.pool.size", 32),
