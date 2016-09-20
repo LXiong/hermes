@@ -90,13 +90,27 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
         try {
             if (readQueue.isEmpty()) {
                 ConsumerRecords<byte[], byte[]> records = consumer.poll(pollTimeout);
-                for (ConsumerRecord<byte[], byte[]> record : records) {
-                    readQueue.add(convertToMessage(record));
+                try {
+                    for (ConsumerRecord<byte[], byte[]> record : records) {
+                        readQueue.add(convertToMessage(record));
+                    }
+                } catch (Exception ex) {
+                    logger.error("Failed to read message for subscription {}, readQueueSize {}, records {}",
+                            subscription.getQualifiedName(),
+                            readQueue.size(),
+                            records.count(),
+                            ex);
                 }
             }
             return Optional.ofNullable(readQueue.poll());
         } catch (KafkaException ex) {
             logger.error("Error while reading message for subscription {}", subscription.getQualifiedName(), ex);
+            return Optional.empty();
+        } catch (Exception ex) {
+            logger.error("Failed to read message for subscription {}, readQueueSize {}",
+                    subscription.getQualifiedName(),
+                    readQueue.size(),
+                    ex);
             return Optional.empty();
         }
     }
