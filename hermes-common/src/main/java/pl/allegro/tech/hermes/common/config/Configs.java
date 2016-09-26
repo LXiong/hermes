@@ -49,7 +49,7 @@ public enum Configs {
     KAFKA_CONSUMER_METRICS_NUM_SAMPLES_CONFIG("kafka.consumer.metrics.num.samples", 2),
     KAFKA_CONSUMER_REQUEST_TIMEOUT_MS_CONFIG("kafka.consumer.request.timeout.ms", 40 * 1000),
     KAFKA_CONSUMER_CONNECTIONS_MAX_IDLE_MS_CONFIG("kafka.consumer.connections.max.idle.ms", 9 * 60 * 1000),
-    KAFKA_CONSUMER_MAX_POLL_RECORDS_CONFIG("kafka.consumer.max.poll.records", Integer.MAX_VALUE),
+    KAFKA_CONSUMER_MAX_POLL_RECORDS_CONFIG("kafka.consumer.max.poll.records", 10),
 
     KAFKA_SIMPLE_CONSUMER_TIMEOUT_MS("kafka.simple.consumer.timeout.ms", 5000),
     KAFKA_SIMPLE_CONSUMER_BUFFER_SIZE("kafka.simple.consumer.buffer.size", 64 * 1024),
@@ -117,7 +117,7 @@ public enum Configs {
     CONSUMER_RECEIVER_POOL_TIMEOUT("consumer.receiver.pool.timeout", 100),
     CONSUMER_RECEIVER_READ_QUEUE_CAPACITY("consumer.receiver.read.queue.capacity", 1000),
 
-    CONSUMER_COMMIT_OFFSET_PERIOD("consumer.commit.offset.period.ms", 15 * 1000),
+    CONSUMER_COMMIT_OFFSET_PERIOD("consumer.commit.offset.period", 15),
     CONSUMER_COMMIT_OFFSET_QUEUES_SIZE("consumer.commit.offset.queues.size", 200_000),
 
     CONSUMER_SENDER_ASYNC_TIMEOUT_MS("consumer.sender.async.timeout.ms", 5_000),

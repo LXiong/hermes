@@ -38,7 +38,6 @@ public class ConsumerProcessSupervisor implements Runnable {
     private final long unhealthyAfter;
 
     private long killAfter;
-    private int commitIntervalMs;
 
     public ConsumerProcessSupervisor(ConsumersExecutorService executor,
                                      Retransmitter retransmitter,
@@ -53,7 +52,6 @@ public class ConsumerProcessSupervisor implements Runnable {
         this.killAfter = configs.getIntProperty(Configs.CONSUMER_BACKGROUND_SUPERVISOR_KILL_AFTER);
 
         this.signalsFilter = new SignalsFilter(taskQueue, clock);
-        this.commitIntervalMs = configs.getIntProperty(Configs.CONSUMER_COMMIT_OFFSET_PERIOD);
     }
 
     public void accept(Signal signal) {
@@ -171,7 +169,7 @@ public class ConsumerProcessSupervisor implements Runnable {
 
         if (!runningProcesses.hasProcess(subscriptionName)) {
             ConsumerProcess process = new ConsumerProcess(subscriptionName, consumer, retransmitter,
-                    this::handleProcessShutdown, commitIntervalMs, clock);
+                    this::handleProcessShutdown, clock);
             Future future = executor.execute(process);
             runningProcesses.add(process, future);
             logger.info("Started consumer process {}", process);

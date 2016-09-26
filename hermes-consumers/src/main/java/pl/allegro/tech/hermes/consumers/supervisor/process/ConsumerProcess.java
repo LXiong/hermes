@@ -34,7 +34,6 @@ public class ConsumerProcess implements Runnable {
             Consumer consumer,
             Retransmitter retransmitter,
             java.util.function.Consumer<SubscriptionName> shutdownCallback,
-            int commitIntervalMs,
             Clock clock
     ) {
         this.subscriptionName = subscriptionName;
