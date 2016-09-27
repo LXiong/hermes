@@ -114,10 +114,14 @@ public class ConsumerProcessSupervisor implements Runnable {
                     process(signal).accept(Signal.of(Signal.SignalType.RESTART, signal.getTarget()));
                     taskQueue.offer(Signal.of(Signal.SignalType.KILL_UNHEALTHY, signal.getTarget(), killTime()));
                     break;
+                case COMMIT:
+                    process(signal).accept(signal);
+                    break;
                 case KILL_UNHEALTHY:
                     Consumer consumer = runningProcesses.getProcess(signal.getTarget()).getConsumer();
                     taskQueue.offer(Signal.of(Signal.SignalType.START, signal.getTarget(), consumer));
                     kill(signal.getTarget());
+                    break;
                 case CLEANUP:
                     cleanup(signal.getTarget());
                     break;

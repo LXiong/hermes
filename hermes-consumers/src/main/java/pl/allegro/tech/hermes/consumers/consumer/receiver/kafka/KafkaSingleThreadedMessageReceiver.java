@@ -153,9 +153,11 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
 
     @Override
     public void commit(Set<SubscriptionPartitionOffset> offsets) {
-        consumer.commitAsync(createOffset(offsets), (failedOffsets, ex) -> {
-            logger.error("Error while committing offset for subscription {}", subscription.getQualifiedName(), ex);
-            metrics.counter("offset-committer.failed").inc();
+        consumer.commitAsync(createOffset(offsets), (partitions, ex) -> {
+            if (ex != null) {
+                logger.error("Error while committing offset for subscription {}, {}", subscription.getQualifiedName(), ex);
+                metrics.counter("offset-committer.failed").inc();
+            }
         });
     }
 
@@ -165,13 +167,17 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
             TopicPartition topicAndPartition = new TopicPartition(
                     partitionOffset.getKafkaTopicName().asString(),
                     partitionOffset.getPartition());
-            offsetsData.put(topicAndPartition, new OffsetAndMetadata(partitionOffset.getOffset()));
+
+            if (consumer.position(topicAndPartition) >= partitionOffset.getOffset()) {
+                offsetsData.put(topicAndPartition, new OffsetAndMetadata(partitionOffset.getOffset()));
+            }
         }
         return offsetsData;
     }
 
     @Override
     public void moveOffset(SubscriptionPartitionOffset offset) {
+        logger.info("Moving offset for subscription {} {}", subscription.getQualifiedName(), offset.toString());
         consumer.seek(new TopicPartition(offset.getKafkaTopicName().asString(), offset.getPartition()), offset.getOffset());
     }
 }
