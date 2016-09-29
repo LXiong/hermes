@@ -153,12 +153,12 @@ public class KafkaSingleThreadedMessageReceiver implements MessageReceiver {
 
     @Override
     public void commit(Set<SubscriptionPartitionOffset> offsets) {
-        consumer.commitAsync(createOffset(offsets), (partitions, ex) -> {
-            if (ex != null) {
-                logger.error("Error while committing offset for subscription {}, {}", subscription.getQualifiedName(), ex);
-                metrics.counter("offset-committer.failed").inc();
-            }
-        });
+        try {
+            consumer.commitSync(createOffset(offsets));
+        } catch (Exception ex) {
+            logger.error("Error while committing offset for subscription {}, {}", subscription.getQualifiedName(), ex);
+            metrics.counter("offset-committer.failed").inc();
+        }
     }
 
     private Map<TopicPartition, OffsetAndMetadata> createOffset(Set<SubscriptionPartitionOffset> partitionOffsets) {
